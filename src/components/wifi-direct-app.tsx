@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -240,6 +240,10 @@ export default function WifiDirectApp() {
             const chunk = e.target.result as ArrayBuffer;
 
             try {
+                if (dc.current.bufferedAmount > 65535) {
+                    setTimeout(() => fileReader.onload!(e), 100);
+                    return;
+                }
                 dc.current.send(chunk);
                 offset += chunk.byteLength;
                 
